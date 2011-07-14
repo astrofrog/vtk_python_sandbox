@@ -9,6 +9,7 @@ import pyfits
 # The only limit is that the data must be reduced to unsigned 8 bit or 16 bit integers.
 data_matrix = pyfits.getdata('L1448_13CO.fits.gz')
 data_matrix = data_matrix[145:245,:,:]
+data_matrix[data_matrix < 0.7] = 0.
 data_matrix = (data_matrix * 100).astype(uint8)
 nz, ny, nx = data_matrix.shape
  
@@ -40,10 +41,19 @@ alphaChannelFunc.AddPoint(150, 0.2)
  
 # This class stores color data and can create color tables from a few color points. For this demo, we want the three cubes
 # to be of the colors red green and blue.
+
 colorFunc = vtk.vtkColorTransferFunction()
-colorFunc.AddRGBPoint(50, 1.0, 0.0, 0.0)
-colorFunc.AddRGBPoint(100, 0.0, 1.0, 0.0)
-colorFunc.AddRGBPoint(150, 0.0, 0.0, 1.0)
+colorFunc.AddRGBPoint(0.0, 0.0, 0.0, 0.0)
+colorFunc.AddRGBPoint(64.0, 1.0, 0.0, 0.0)
+colorFunc.AddRGBPoint(128.0, 0.0, 0.0, 1.0)
+colorFunc.AddRGBPoint(192.0, 0.0, 1.0, 0.0)
+colorFunc.AddRGBPoint(255.0, 0.0, 0.2, 0.0)
+
+# colorFunc = vtk.vtkColorTransferFunction()
+# colorFunc.AddRGBPoint(1, 0.0, 0.0, 0.0)
+# colorFunc.AddRGBPoint(50, 1.0, 0.0, 0.0)
+# colorFunc.AddRGBPoint(100, 0.0, 1.0, 0.0)
+# colorFunc.AddRGBPoint(150, 0.0, 0.0, 1.0)
  
 # The preavius two classes stored properties. Because we want to apply these properties to the volume we want to render,
 # we have to store them in a class that stores volume prpoperties.
