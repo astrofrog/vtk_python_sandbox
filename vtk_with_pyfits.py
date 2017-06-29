@@ -1,15 +1,16 @@
 import vtk
 from numpy import *
 
-import pyfits
+from astropy.io import fits
 
 # We begin by creating the data we want to render.
 # For this tutorial, we create a 3D-image containing three overlaping cubes.
 # This data can of course easily be replaced by data from a medical CT-scan or anything else three dimensional.
 # The only limit is that the data must be reduced to unsigned 8 bit or 16 bit integers.
-data_matrix = pyfits.getdata('L1448_13CO.fits.gz')
-data_matrix = data_matrix[145:245,:,:]
-data_matrix[data_matrix < 0.7] = 0.
+
+data_matrix = fits.open('l1448_13CO.fits')[0].data #pyfits.getdata('L1448_13CO.fits.gz')
+# data_matrix = data_matrix[145:245,:,:]
+data_matrix[data_matrix < 0.5] = 0.
 data_matrix = (data_matrix * 100).astype(uint8)
 nz, ny, nx = data_matrix.shape
  
