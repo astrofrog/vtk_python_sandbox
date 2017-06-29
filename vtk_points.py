@@ -11,7 +11,8 @@ class VtkPointCloud:
         self.maxNumPoints = maxNumPoints
         self.vtkPolyData = vtk.vtkPolyData()
         self.clearPoints()
-        mapper = vtk.vtkPolyDataMapper()
+        # mapper = vtk.vtkPolyDataMapper()
+        mapper = vtk.vtkOpenGLPolyDataMapper()
         mapper.SetInputData(self.vtkPolyData)
         mapper.SetColorModeToDefault()
         mapper.SetScalarRange(zMin, zMax)
@@ -19,12 +20,13 @@ class VtkPointCloud:
         self.vtkActor = vtk.vtkActor()
         self.vtkActor.SetMapper(mapper)
 
-    def addPoint(self, point):
+    def addPoint(self, point, size=5):
         if self.vtkPoints.GetNumberOfPoints() < self.maxNumPoints:
             pointId = self.vtkPoints.InsertNextPoint(point[:])
             self.vtkDepth.InsertNextValue(point[2])
             self.vtkCells.InsertNextCell(1)
             self.vtkCells.InsertCellPoint(pointId)
+            self.vtkActor.GetProperty().SetPointSize(size)
         else:
             r = random.randint(0, self.maxNumPoints)
             self.vtkPoints.SetPoint(r, point[:])
@@ -49,7 +51,7 @@ tbdata=fits.open(inputFile)[1].data
 xyz=np.zeros((tbdata.shape[0], 3))
 xyz[:, 0] = tbdata['x_gal']
 xyz[:, 1] = tbdata['y_gal']
-xyz[:, 2] = tbdata['z_gal']
+xyz[:, 2] = tbdata['z_gal']*10
 
 numberOfPoints = tbdata.shape[0]
 
