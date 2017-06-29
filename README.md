@@ -1,7 +1,5 @@
-Installing VTK
-==============
+Install vtk7 on MacOS 64 (python=3.6.1)
+===============
 
-Easiest way to install VTK 5 with Python support:
-
-    sudo port install vtk5 +python27 +qt4_mac
+conda install -c clinicalgraphics vtk=7.1.0
 
