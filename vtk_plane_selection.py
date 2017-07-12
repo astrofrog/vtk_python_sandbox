@@ -14,7 +14,10 @@
 
 # First we import the VTK Python package that will make available all
 # of the VTK commands to Python.
+import os
 import vtk
+
+TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
 
 # Next we create an instance of vtkConeSource and set some of its
 # properties. The instance of vtkConeSource "cone" is part of a
@@ -111,7 +114,9 @@ boxWidget.On()
 
 # Start the event loop.
 iren.Initialize()
-iren.Start()
+
+if not TRAVIS:
+    iren.Start()
 
 # There is no explicit need to free any objects at this point.
 # Once Python exits, memory is automatically freed.

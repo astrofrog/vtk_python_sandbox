@@ -1,4 +1,7 @@
+import os
 import vtk 
+
+TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
  
 NUMBER_OF_SPHERES = 10
  
@@ -91,4 +94,6 @@ for i in range(NUMBER_OF_SPHERES):
  
 # Start
 interactor.Initialize()
-interactor.Start()
+renwin.Render()
+if not TRAVIS:
+    interactor.Start()

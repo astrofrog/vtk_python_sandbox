@@ -1,0 +1,23 @@
+language: c
+
+os:
+    - osx
+    - linux
+
+sudo: false
+
+env:
+    global:
+        - PYTHON_VERSION=3.6
+        - CONDA_DEPENDENCIES='pyqt astropy vtk'
+        - VTK_VERSION=7.1
+        - PYQT_VERSION=5
+        - CONDA_CHANNELS='clinicalgraphics'
+        - SETUP_XVFB=True
+
+install:
+    - git clone git://github.com/astropy/ci-helpers.git
+    - source ci-helpers/travis/setup_conda.sh
+
+script:
+    - ./run_all.sh

@@ -1,7 +1,10 @@
+import os
 import vtk
 import numpy as np
 from numpy import random
 from astropy.io import fits
+
+TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
 
 # TODO: follow http://public.kitware.com/pipermail/paraview/2012-February/023989.html for setting color with column data
 
@@ -55,7 +58,7 @@ xyz[:, 2] = tbdata['z_gal']*10
 
 numberOfPoints = tbdata.shape[0]
 
-for i in xrange(numberOfPoints):
+for i in range(numberOfPoints):
     print('point pos', xyz[i][:3])
     pointCloud.addPoint(xyz[i][:3])
 
@@ -75,4 +78,6 @@ renderWindowInteractor.SetRenderWindow(renderWindow)
 
 # Begin Interaction
 renderWindow.Render()
-renderWindowInteractor.Start()
+
+if not TRAVIS:
+    renderWindowInteractor.Start()

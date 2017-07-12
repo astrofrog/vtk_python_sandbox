@@ -31,11 +31,14 @@ Changes by Phil Thompson, Mar. 2008
  Added cursor support.
 """
 
-
+import os
 from PyQt4 import QtCore, QtGui
 import vtk
 import pyfits
 from numpy import *
+
+TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
+
 
 class QVTKRenderWindowInteractor(QtGui.QWidget):
 
@@ -90,14 +93,14 @@ class QVTKRenderWindowInteractor(QtGui.QWidget):
     - Keypress f: fly to the picked point
 
     - Keypress p: perform a pick operation. The render window interactor
-    has an internal instance of vtkCellPicker that it uses to pick. 
+    has an internal instance of vtkCellPicker that it uses to pick.
 
     - Keypress r: reset the camera view along the current view
     direction. Centers the actors and moves the camera so that all actors
     are visible.
 
     - Keypress s: modify the representation of all actors so that they
-    are surfaces. 
+    are surfaces.
 
     - Keypress u: invoke the user-defined function. Typically, this
     keypress will bring up an interactor that you can type commands in.
@@ -343,7 +346,7 @@ class QVTKRenderWindowInteractor(QtGui.QWidget):
         self.update()
 
 
-def QVTKRenderWidgetPyFITSExample():    
+def QVTKRenderWidgetPyFITSExample():
     """A simple example that uses the QVTKRenderWindowInteractor class."""
 
     # We begin by creating the data we want to render.
@@ -355,7 +358,7 @@ def QVTKRenderWidgetPyFITSExample():
     data_matrix[data_matrix < 0.7] = 0.
     data_matrix = (data_matrix * 100).astype(uint8)
     nz, ny, nx = data_matrix.shape
- 
+
     # For VTK to be able to use the data, it must be stored as a VTK-image. This can be done by the vtkImageImport-class which
     # imports raw data and stores it.
     dataImporter = vtk.vtkImageImport()
@@ -373,7 +376,7 @@ def QVTKRenderWidgetPyFITSExample():
     # VTK complains if not both are used.
     dataImporter.SetDataExtent(0, nx-1, 0, ny-1, 0, nz-1)
     dataImporter.SetWholeExtent(0, nx-1, 0, ny-1, 0, nz-1)
- 
+
     # The following class is used to store transparencyv-values for later retrival. In our case, we want the value 0 to be
     # completly opaque whereas the three different cubes are given different transperancy-values to show how it works.
     alphaChannelFunc = vtk.vtkPiecewiseFunction()
@@ -381,7 +384,7 @@ def QVTKRenderWidgetPyFITSExample():
     alphaChannelFunc.AddPoint(50, 0.05)
     alphaChannelFunc.AddPoint(100, 0.1)
     alphaChannelFunc.AddPoint(150, 0.2)
- 
+
     # This class stores color data and can create color tables from a few color points. For this demo, we want the three cubes
     # to be of the colors red green and blue.
 
@@ -397,20 +400,20 @@ def QVTKRenderWidgetPyFITSExample():
     # colorFunc.AddRGBPoint(50, 1.0, 0.0, 0.0)
     # colorFunc.AddRGBPoint(100, 0.0, 1.0, 0.0)
     # colorFunc.AddRGBPoint(150, 0.0, 0.0, 1.0)
- 
+
     # The preavius two classes stored properties. Because we want to apply these properties to the volume we want to render,
     # we have to store them in a class that stores volume prpoperties.
     volumeProperty = vtk.vtkVolumeProperty()
     volumeProperty.SetColor(colorFunc)
     volumeProperty.SetScalarOpacity(alphaChannelFunc)
- 
+
     # This class describes how the volume is rendered (through ray tracing).
     compositeFunction = vtk.vtkVolumeRayCastCompositeFunction()
     # We can finally create our volume. We also have to specify the data for it, as well as how the data will be rendered.
     volumeMapper = vtk.vtkVolumeRayCastMapper()
     volumeMapper.SetVolumeRayCastFunction(compositeFunction)
     volumeMapper.SetInputConnection(dataImporter.GetOutputPort())
- 
+
     # The class vtkVolume is used to pair the preaviusly declared volume as well as the properties to be used when rendering that volume.
     volume = vtk.vtkVolume()
     volume.SetMapper(volumeMapper)
@@ -436,7 +439,8 @@ def QVTKRenderWidgetPyFITSExample():
     widget.show()
 
     # start event processing
-    app.exec_()
+    if not TRAVIS:
+        app.exec_()
 
 if __name__ == "__main__":
     QVTKRenderWidgetPyFITSExample()

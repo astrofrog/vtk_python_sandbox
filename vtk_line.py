@@ -3,8 +3,11 @@
 # This example demonstrates the use of vtkCardinalSpline.
 # It creates random points and connects them with a spline
 
+import os
 import vtk
 from vtk.util.colors import tomato, banana
+
+TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
 
 # This will be used later to get random numbers.
 math = vtk.vtkMath()
@@ -114,4 +117,6 @@ renWin.SetSize(500, 500)
 
 iren.Initialize()
 renWin.Render()
-iren.Start()
+
+if not TRAVIS:
+    iren.Start()

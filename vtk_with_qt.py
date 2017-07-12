@@ -31,9 +31,11 @@ Changes by Phil Thompson, Mar. 2008
  Added cursor support.
 """
 
-
+import os
 from PyQt4 import QtCore, QtGui
 import vtk
+
+TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
 
 
 class QVTKRenderWindowInteractor(QtGui.QWidget):
@@ -89,14 +91,14 @@ class QVTKRenderWindowInteractor(QtGui.QWidget):
     - Keypress f: fly to the picked point
 
     - Keypress p: perform a pick operation. The render window interactor
-    has an internal instance of vtkCellPicker that it uses to pick. 
+    has an internal instance of vtkCellPicker that it uses to pick.
 
     - Keypress r: reset the camera view along the current view
     direction. Centers the actors and moves the camera so that all actors
     are visible.
 
     - Keypress s: modify the representation of all actors so that they
-    are surfaces. 
+    are surfaces.
 
     - Keypress u: invoke the user-defined function. Typically, this
     keypress will bring up an interactor that you can type commands in.
@@ -344,7 +346,7 @@ class QVTKRenderWindowInteractor(QtGui.QWidget):
         self.update()
 
 
-def QVTKRenderWidgetConeExample():    
+def QVTKRenderWidgetConeExample():
     """A simple example that uses the QVTKRenderWindowInteractor class."""
 
     # every QT app needs an app
@@ -376,7 +378,8 @@ def QVTKRenderWidgetConeExample():
     widget.show()
 
     # start event processing
-    app.exec_()
+    if not TRAVIS:
+        app.exec_()
 
 if __name__ == "__main__":
     QVTKRenderWidgetConeExample()
