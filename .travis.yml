@@ -9,7 +9,7 @@ sudo: false
 env:
     global:
         - PYTHON_VERSION=3.6
-        - CONDA_DEPENDENCIES='pyqt astropy vtk'
+        - CONDA_DEPENDENCIES='pyqt astropy vtk qtpy'
         - VTK_VERSION=7.1
         - PYQT_VERSION=5
         - CONDA_CHANNELS='clinicalgraphics'
