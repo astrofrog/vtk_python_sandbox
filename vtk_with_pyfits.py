@@ -1,7 +1,7 @@
 import os
-import vtk
-from numpy import *
 
+import vtk
+import numpy as np
 from astropy.io import fits
 
 TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
@@ -14,7 +14,7 @@ TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
 data_matrix = fits.open('l1448_13CO.fits')[0].data #pyfits.getdata('L1448_13CO.fits.gz')
 # data_matrix = data_matrix[145:245,:,:]
 data_matrix[data_matrix < 0.5] = 0.
-data_matrix = (data_matrix * 100).astype(uint8)
+data_matrix = (data_matrix * 100).astype(np.uint8)
 nz, ny, nx = data_matrix.shape
 
 # For VTK to be able to use the data, it must be stored as a VTK-image. This can be done by the vtkImageImport-class which

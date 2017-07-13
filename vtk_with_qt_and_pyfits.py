@@ -32,15 +32,16 @@ Changes by Phil Thompson, Mar. 2008
 """
 
 import os
-from PyQt4 import QtCore, QtGui
+
 import vtk
-import pyfits
-from numpy import *
+import numpy as np
+from astropy.io import fits
+from qtpy import QtCore, QtWidgets
 
 TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
 
 
-class QVTKRenderWindowInteractor(QtGui.QWidget):
+class QVTKRenderWindowInteractor(QtWidgets.QWidget):
 
     """ A QVTKRenderWindowInteractor for Python and Qt.  Uses a
     vtkGenericRenderWindowInteractor to handle the interactions.  Use
@@ -140,17 +141,17 @@ class QVTKRenderWindowInteractor(QtGui.QWidget):
 
         stereo = 0
 
-        if kw.has_key('stereo'):
+        if 'stereo' in kw:
             if kw['stereo']:
                 stereo = 1
 
         rw = None
 
-        if kw.has_key('rw'):
+        if 'rw' in kw:
             rw = kw['rw']
 
         # create qt-level widget
-        QtGui.QWidget.__init__(self, parent, wflags|QtCore.Qt.MSWindowsOwnDC)
+        QtWidgets.QWidget.__init__(self, parent, wflags|QtCore.Qt.MSWindowsOwnDC)
 
         if rw: # user-supplied render window
             self._RenderWindow = rw
@@ -171,10 +172,10 @@ class QVTKRenderWindowInteractor(QtGui.QWidget):
         self.setAttribute(QtCore.Qt.WA_PaintOnScreen)
         self.setMouseTracking(True) # get all mouse events
         self.setFocusPolicy(QtCore.Qt.WheelFocus)
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self._Timer = QtCore.QTimer(self)
-        self.connect(self._Timer, QtCore.SIGNAL('timeout()'), self.TimerEvent)
+        # self.connect(self._Timer, QtCore.SIGNAL('timeout()'), self.TimerEvent)
 
         self._Iren.AddObserver('CreateTimerEvent', self.CreateTimer)
         self._Iren.AddObserver('DestroyTimerEvent', self.DestroyTimer)
@@ -188,8 +189,7 @@ class QVTKRenderWindowInteractor(QtGui.QWidget):
         elif hasattr(self._Iren, attr):
             return getattr(self._Iren, attr)
         else:
-            raise AttributeError, self.__class__.__name__ + \
-                  " has no attribute named " + attr
+            raise AttributeError(self.__class__.__name__ + " has no attribute named " + attr)
 
     def CreateTimer(self, obj, evt):
         self._Timer.start(10)
@@ -353,10 +353,10 @@ def QVTKRenderWidgetPyFITSExample():
     # For this tutorial, we create a 3D-image containing three overlaping cubes.
     # This data can of course easily be replaced by data from a medical CT-scan or anything else three dimensional.
     # The only limit is that the data must be reduced to unsigned 8 bit or 16 bit integers.
-    data_matrix = pyfits.getdata('L1448_13CO.fits.gz')
+    data_matrix = fits.getdata('L1448_13CO.fits')
     data_matrix = data_matrix[145:245,:,:]
     data_matrix[data_matrix < 0.7] = 0.
-    data_matrix = (data_matrix * 100).astype(uint8)
+    data_matrix = (data_matrix * 100).astype(np.uint8)
     nz, ny, nx = data_matrix.shape
 
     # For VTK to be able to use the data, it must be stored as a VTK-image. This can be done by the vtkImageImport-class which
@@ -401,26 +401,30 @@ def QVTKRenderWidgetPyFITSExample():
     # colorFunc.AddRGBPoint(100, 0.0, 1.0, 0.0)
     # colorFunc.AddRGBPoint(150, 0.0, 0.0, 1.0)
 
-    # The preavius two classes stored properties. Because we want to apply these properties to the volume we want to render,
-    # we have to store them in a class that stores volume prpoperties.
+    # The preavius two classes stored properties. Because we want to apply these
+    # properties to the volume we want to render, we have to store them in a
+    # class that stores volume prpoperties.
     volumeProperty = vtk.vtkVolumeProperty()
     volumeProperty.SetColor(colorFunc)
     volumeProperty.SetScalarOpacity(alphaChannelFunc)
 
     # This class describes how the volume is rendered (through ray tracing).
     compositeFunction = vtk.vtkVolumeRayCastCompositeFunction()
-    # We can finally create our volume. We also have to specify the data for it, as well as how the data will be rendered.
+
+    # We can finally create our volume. We also have to specify the data for it,
+    # as well as how the data will be rendered.
     volumeMapper = vtk.vtkVolumeRayCastMapper()
     volumeMapper.SetVolumeRayCastFunction(compositeFunction)
     volumeMapper.SetInputConnection(dataImporter.GetOutputPort())
 
-    # The class vtkVolume is used to pair the preaviusly declared volume as well as the properties to be used when rendering that volume.
+    # The class vtkVolume is used to pair the preaviusly declared volume as well
+    # as the properties to be used when rendering that volume.
     volume = vtk.vtkVolume()
     volume.SetMapper(volumeMapper)
     volume.SetProperty(volumeProperty)
 
     # every QT app needs an app
-    app = QtGui.QApplication(['QVTKRenderWindowInteractor'])
+    app = QtWidgets.QApplication(['QVTKRenderWindowInteractor'])
 
     # create the widget
     widget = QVTKRenderWindowInteractor()
@@ -433,7 +437,7 @@ def QVTKRenderWidgetPyFITSExample():
     widget.GetRenderWindow().AddRenderer(ren)
 
     ren.AddVolume(volume)
-    ren.SetBackground(0,0,0)
+    ren.SetBackground(0, 0, 0)
 
     # show the widget
     widget.show()
