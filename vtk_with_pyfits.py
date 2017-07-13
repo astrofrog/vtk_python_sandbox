@@ -11,7 +11,7 @@ TRAVIS = os.environ.get('TRAVIS', 'false') == 'true'
 # This data can of course easily be replaced by data from a medical CT-scan or anything else three dimensional.
 # The only limit is that the data must be reduced to unsigned 8 bit or 16 bit integers.
 
-data_matrix = fits.open('l1448_13CO.fits')[0].data #pyfits.getdata('L1448_13CO.fits.gz')
+data_matrix = fits.open('L1448_13CO.fits')[0].data #pyfits.getdata('L1448_13CO.fits.gz')
 # data_matrix = data_matrix[145:245,:,:]
 data_matrix[data_matrix < 0.5] = 0.
 data_matrix = (data_matrix * 100).astype(np.uint8)
